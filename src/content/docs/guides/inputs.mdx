@@ -4,44 +4,125 @@ description: sf-tractomics inputs
 ---
 
 import { FileTree } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-### **Basic input directory**
+### Default input format - BIDS
 
-`sf-tractomics` only needs diffusion MRI images. The input structure should look like this:
-
-<FileTree>
-  * input\_directory
-    * sub-01
-      * sub-01\_dwi.nii.gz
-      * sub-01\_dwi.bval
-      * sub-01\_dwi.bvec
-    * sub-02
-      * sub-02\_dwi.nii.gz
-      * sub-02\_dwi.bval
-      * sub-02\_dwi.bvec
-</FileTree>
-
-### **BIDS input directory** (In development)
-
-The [BIDS (Brain Imaging Data Structure)](https://bids-specification.readthedocs.io/en/stable/) input directory is a standardized way to organize and describe neuroimaging and behavioral data. The sf-tractomics pipeline expects the input data to be organized in the BIDS format. Good resources to convert your raw DICOMs files in a BIDS structure include [dcm2bids](https://unfmontreal.github.io/Dcm2Bids/3.2.0/) and/or [heudiconv](https://heudiconv.readthedocs.io/en/latest/). It is recommended that users validate their BIDS layout using the official [bids-validator tool](https://hub.docker.com/r/bids/validator) docker image or the [web-based version](https://bids-standard.github.io/bids-validator/).
-
-`sf-tractomics` will soon be BIDS compatible.
-
-### **If you want to use your own mask**
-
-`sf-tractomics` allows to extract the brain (step 3) with a nnUNet algorithm. If you don't want to use this method, you also can provide a mask, but the input structure should look like this:
+`sf-tractomics` input folder must follow a valid [BIDS](https://bids-specification.readthedocs.io/en/stable/) format,
+that minimally contains **diffusion** (**dwi**) and **T1-weighted** (**T1w**) MRI acquisitions :
 
 <FileTree>
-  * input\_directory
+  * input\_bids\_directory
+    * dataset_description.json
     * sub-01
-      * sub-01\_dwi.bval
-      * sub-01\_dwi.bvec
-      * sub-01\_dwi.nii.gz
-      * sub-01\_mask.nii.gz
+      * dwi
+        * sub-01\_dwi.nii.gz
+        * sub-01\_dwi.bval
+        * sub-01\_dwi.bvec
+      * anat
+        * sub-01\_T1w.nii.gz
     * sub-02
-      * sub-02\_dwi.bval
-      * sub-02\_dwi.bvec
-      * sub-02\_dwi.nii.gz
-      * sub-02\_mask.nii.gz
+      * dwi
+        * sub-02\_dwi.nii.gz
+        * sub-02\_dwi.bval
+        * sub-02\_dwi.bvec
+      * anat
+        * sub-02\_T1w.nii.gz
 </FileTree>
 
+### Perform Motion and Eddy currents correction
+
+`sf-tractomics` automatically detects **reverse-phase** acquired images and **epi** references from the BIDS dataset
+organization. To be detected, those images need to have a valid [direction](https://bids-specification.readthedocs.io/en/stable/appendices/entities.html#dir)
+entity. The same is expected for the main diffusion volume as well (**AP** and **PA** are used as example) :
+
+<Tabs>
+
+<TabItem label="Reverse b0">
+
+<FileTree>
+  * input\_bids\_directory
+    * dataset_description.json
+    * sub-01
+      * dwi
+        * sub-01\_dir-AP\_dwi.nii.gz
+        * sub-01\_dir-AP\_dwi.bval
+        * sub-01\_dir-AP\_dwi.bvec
+      * anat
+        * sub-01\_T1w.nii.gz
+      * epi
+        * sub-01\_dir-PA\_sbref.nii.gz
+    * sub-02
+      * dwi
+        * sub-02\_dir-AP\_dwi.nii.gz
+        * sub-02\_dir-AP\_dwi.bval
+        * sub-02\_dir-AP\_dwi.bvec
+      * anat
+        * sub-02\_T1w.nii.gz
+      * epi
+        * sub-02\_dir-PA\_sbref.nii.gz
+</FileTree>
+
+</TabItem>
+
+<TabItem label="Reverse DWI">
+
+:::caution[Gradient protocols must fit !]
+The correction only works if you provide the **exact same gradient protocol** for both DWI
+volumes
+:::
+
+<FileTree>
+  * input\_bids\_directory
+    * dataset_description.json
+    * sub-01
+      * dwi
+        * sub-01\_dir-AP\_dwi.nii.gz
+        * sub-01\_dir-AP\_dwi.bval
+        * sub-01\_dir-AP\_dwi.bvec
+        * sub-01\_dir-PA\_dwi.nii.gz
+        * sub-01\_dir-PA\_dwi.bval
+        * sub-01\_dir-PA\_dwi.bvec
+      * anat
+        * sub-01\_T1w.nii.gz
+    * sub-02
+      * dwi
+        * sub-02\_dir-AP\_dwi.nii.gz
+        * sub-02\_dir-AP\_dwi.bval
+        * sub-02\_dir-AP\_dwi.bvec
+        * sub-02\_dir-PA\_dwi.nii.gz
+        * sub-02\_dir-PA\_dwi.bval
+        * sub-02\_dir-PA\_dwi.bvec
+      * anat
+        * sub-02\_T1w.nii.gz
+      * epi
+        * sub-02\_dir-PA\_sbref.nii.gz
+</FileTree>
+
+</TabItem>
+
+</Tabs>
+
+### Unstructured datasets
+
+`sf-tractomics` also supports parsing its input from a `samplesheet.csv` in **C**omma **S**eparated **V**alues format, in case
+your dataset doesn't follow the BIDS format yet. The samplesheet must respect the header below :
+
+```csv
+subject,dwi,bval,bvec,sbref,rev_dwi,rev_bval,rev_bvec,rev_sbref,t1,wmparc,aparc_aseg
+```
+
+|||
+|-|-|
+| subject | Identifier to tag the subject's files when producing outputs|
+| dwi | Diffusion Weighted volume in Nifti format|
+| bval | b-values file following FSL format|
+| bvec | b-vectors file following FSL format|
+| sbref | Single-band b0 reference for the DWI volume in Nifti format|
+| rev_dwi | Reverse-phase acquired Diffusion Weighted volume in Nifti format|
+| rev_bval | b-values file for the reverse-phase DWI following FSL format|
+| rev_bvec | b-vectors file for the reverse-phase DWI following FSL format|
+| rev_sbref | Single-band b0 reference for the reverse-phase DWI volume in Nifti format|
+| t1 | Anatomical T1-Weighted volume in Nifti format|
+| wmparc | White matter parcellation from _FreeSurfer_|
+| aparc_aseg | Tissue segmentation and cortical parcellation from _FreeSurfer_|
