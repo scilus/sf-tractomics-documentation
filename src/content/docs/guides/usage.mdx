@@ -8,24 +8,19 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { FileTree } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
 
-![sf-tractomics pipeline schema](../../../assets/0.1.0/sf-tractomics-schema.png)
+![sf-tractomics pipeline schema](../../../assets/sf-tractomics-schema.png)
 
-### **Choosing a profile**
+## **Choosing a profile**
 
-Some `sf-tractomics` core functionalities are accessed and selected using profiles and arguments. 
+Some `sf-tractomics` core functionalities are accessed and selected using profiles and arguments.
 
 **Processing profiles**:
 
-<Steps>
-  1. **`-pre_qc`:**
+   1. **`-profile gpu`**
 
-     By selecting this profile, you will run a set of checks and validations steps to insure your images and bvecs are oriented correctly.
-
-     :::caution
-     **If you want to use the output of the **pre QC** data you must add --use_preqc. See [parameters section](/sf-tractomics/0.1.0/guides/parameters).**
-     :::
-
-</Steps>
+      Activate usage of GPU accelerated algorithms to drastically increase processing speeds. Currently only
+      uspports **nvidia GPU**. Accelerations for **FSL Eddy** and **Local tractography** are automatically enabled
+      using this profile. 
 
 **Configuration profiles**:
 
@@ -53,8 +48,9 @@ Some `sf-tractomics` core functionalities are accessed and selected using profil
 
 **Using either `-profile docker` or `-profile apptainer` is highly recommended, as it controls the version of the software used and ensure reproducibility.** While it is technically possible to run the pipeline without Docker or Apptainer, the amount of dependencies to install is simply not worth it.
 
-:::note[Multiple profiles]
-For example, to perform the pre_qc and use apptainer, users should select `-profile pre_qc,apptainer`.
+:::tip[Using multiple profiles]
+More than one profile can be used at the same time ! For exmaple, `-profile docker,gpu` will activate both running the processes in Docker Containers,
+and configures access to GPUs for those containers.
 :::
 
 ### **Typical command-line**
@@ -64,71 +60,87 @@ The typical command for running the pipeline is as follows:
 <Tabs>
   <TabItem label="Command">
     ```bash
-    nextflow run ~/s/sf-tractomics/main.nf --input <input_directory> --outdir ./results --lean_output true -profile docker,pre_qc --use_preqc -resume -with-report <report_name>.html
+    nextflow run scilus/sf-tractomics -r 0.1.0 --input <input_directory> --outdir ./results -profile docker -resume -with-report <report_name>.html
     ```
   </TabItem>
 </Tabs>
 
-This will launch the pipeline with the `docker` configuration profile, will run the pre_qc steps and also use the corrected images and bvecs to continue the processing.
-There are only 3 parameters that need to be supplied at runtime:
+This will launch the pipeline with the `docker` configuration profile, will run preprocessing, alignment of anatomy in diffusion space,
+reconstruct diffusion profiles (DTI and fODF) and perform tracography (local and particle filtering algorithms). There are only 3 parameters
+that need to be supplied at runtime:
 
 <Steps>
   1. **`--input`**: for the path to your BIDS directory
 
-     For more details on how to organize your input folder, please refer to the [inputs section](/sf-tractomics/0.1.0/guides/inputs).
+     For more details on how to organize your input folder, please refer to the [inputs section](/sf-tractomics/guides/inputs).
 
 
   2. **`--outdir`**: path to the output directory
 
-     We do not specify a default for the output directory location to ensure that users have total control on where the output files will be stored, as it can quickly grow into a large number of files. The recommended naming would be something along the line of `sf-tractomics-v{version}` where `{version}` could be `0.1.0` for example.
+     We do not specify a default for the output directory location to ensure that users have total control on where the output files will be stored,
+     as it can quickly grow into a large number of files. The recommended naming would be something along the line of `sf-tractomics-v{version}` where
+     `{version}` could be `0.1.0` for example.
 
   3. **`-profile`**: profile to be run and container system to use
 
-     `sf-tractomics` processing steps was designed in profiles, giving users total control on which type of processing they want to make. One caveat is that users need to explicit tell which profile to run. This is done via the `-profile` parameter. To view the available processing profiles, please see [this section](#choosing-a-profile)
+     `sf-tractomics` processing steps was designed in profiles, giving users total control on which type of processing they want to make. One caveat
+     is that users need to explicitly tell which profile to run. This is done via the `-profile` parameter. To view the available processing profiles,
+     please see [this section](#choosing-a-profile)
 
      :::note
-     The `-profile` command line parameter is a core `nextflow` parameter, hence the preceding single dash. This means you can also specify nextflow specific profile side-by-side `sf-tractomics` processing profiles (e.g., the docker/apptainer selection).
+     The `-profile` command line parameter is a core `nextflow` parameter, hence the preceding single dash. This means you can also specify nextflow
+     specific profile side-by-side `sf-tractomics` processing profiles (e.g., the docker/apptainer selection).
      :::
 
   4. **`-resume`**: Enables `nextflow` caching capabilities.
 
-     This is a core `nextflow` arguments. It enables the *resumability* of your pipeline. In the event where the pipeline fails for a variety of reasons, the following run will start back where it left off. For more details, see the [core `nextflow` arguments section](#core-nextflow-arguments).
+     This is a core `nextflow` arguments. It enables the *resumability* of your pipeline. In the event where the pipeline fails for a variety of reasons,
+     the following run will start back where it left off. For more details, see the [core `nextflow` arguments section](#core-nextflow-arguments).
 
 
   5. **`-with-report`**: Enables `nextflow` caching capabilities.
 
      This is a core `nextflow` arguments. It enables the  *html report* of your pipeline. For more details, see the [core `nextflow` arguments section](#core-nextflow-arguments).
+
 </Steps>
+
 :::note
-More parameters can be tuned to your own usage, for a concise list of the most common parameters, you can run `nextflow run scilus/sf-tractomics -r 0.1.0 --help`. Otherwise, for the complete list of parameters, please refer to the [parameters section](/sf-tractomics/0.1.0/guides/parameters) of the documentation.
+More parameters can be tuned to your own usage, for a concise list of the most common parameters, you can run `nextflow run scilus/sf-tractomics -r 0.1.0 --help`.
+Otherwise, for the complete list of parameters, please refer to the [parameters section](/sf-tractomics/guides/parameters) of the documentation.
 :::
 
 :::caution[Running the pipeline in offline mode]
-If the computer nodes you are planning to use do not have access to the internet, there is a few steps to go through to make sure the containers and templates are available during pipeline execution. Please head over to [running with no internet access section](/sf-tractomics/0.1.0/guides/nointernet).
+If the computer nodes you are planning to use do not have access to the internet, there is a few steps to go through to make sure the containers and
+templates are available during pipeline execution. Please head over to [running with no internet access section](/sf-tractomics/guides/nointernet).
 :::
 
 Note that the pipeline will create the following files in your working directory:
 
 <FileTree>
-  * work/                           # Directory containing the nextflow working files
-  * sf-tractomics-v0.1.0/            # Finished results in specified location (defined with --outdir)
+  * work/                           # Nextflow working directory
+  * .nextflow\_log                  # Log file from Nextflow
+  * sf-tractomics-v0.1.0/           # Results location (defined with --outdir)
+    * pipeline_info                 # GLobal informations on the run
+    * stats                         # Global statistics on the run
     * sub-01
-        * anat/
-        * dwi/
-        * stats/
-        * report/
-  * .nextflow\_log                   # Log file from Nextflow
-  * ...                             # Other nextflow hidden files, eg. history of pipeline runs and old logs.
+      * ...                         # Other entities like session
+        * anat/                     # Clean T1w in diffusion space
+        * dwi/                      # All clean DWI files, models, tractograms, ...
+          * bundles/                # Extracted bundles when using bundling
+      * xfm/                        # Transforms between diffusion and anatomy
+  * ...                             # Other nextflow related files
 </FileTree>
 
-### **Using the params.yml file**
+## **Using the params.yml file**
 
 If you wish to repeatedly use the same parameters for multiple runs, rather than specifying each flag in the command, you can specify these in a params file.
 
 Pipeline settings can be provided in a `yaml` or `json` file via `-params-file <file>`.
 
 :::caution
-Do not use `-c <file>` to specify parameters as this will result in errors. Custom config files specified with `-c` must only be used for [tuning process resource specifications](https://nf-co.re/docs/usage/configuration#tuning-workflow-resources), other infrastructural tweaks (such as output directories), or module arguments (args).
+Do not use `-c <file>` to specify parameters as this will result in errors. Custom config files specified with `-c` must only be used for
+[tuning process resource specifications](https://nf-co.re/docs/usage/configuration#tuning-workflow-resources), other infrastructural tweaks
+(such as output directories), or module arguments (args).
 :::
 
 The above pipeline run specified with a params file in yaml format:
@@ -149,21 +161,28 @@ outdir: './results/'
 <...>
 ```
 
-### **Reproducibility**
+## **Reproducibility**
 
-It is a good idea to specify the pipeline version when running the pipeline on your data. This ensures that a specific version of the pipeline code and software are used when you run your pipeline. If you keep using the same tag, you'll be running the same version of the pipeline, even if there have been changes to the code since.
+It is a good idea to specify the pipeline version when running the pipeline on your data. This ensures that a specific version of the pipeline code and
+software are used when you run your pipeline. If you keep using the same tag, you'll be running the same version of the pipeline, even if there have been
+changes to the code since.
 
-First, go to the [scilus/sf-tractomics releases page](https://github.com/scilus/sf-tractomics/releases) and find the latest pipeline version - numeric only (eg. `0.1.0`). Then specify this when running the pipeline with `-r` (one hyphen) - eg. `-r 0.1.0`. Of course, you can switch to another version by changing the number after the `-r` flag.
+First, go to the [scilus/sf-tractomics releases page](https://github.com/scilus/sf-tractomics/releases) and find the latest pipeline version - numeric only
+(eg. `0.1.0`). Then specify this when running the pipeline with `-r` (one hyphen) - eg. `-r 0.1.0`. Of course, you can switch to another version by changing
+the number after the `-r` flag.
 
-This version number will be logged in reports when you run the pipeline, so that you'll know what you used when you look back in the future. For example, at the bottom of the MultiQC reports.
+This version number will be logged in reports when you run the pipeline, so that you'll know what you used when you look back in the future. For example, at
+the bottom of the MultiQC reports.
 
-To further assist in reproducibility, you can use share and reuse [parameter files](#using-the-paramsyml-file) to repeat pipeline runs with the same settings without having to write out a command with every single parameter.
+To further assist in reproducibility, you can use share and reuse [parameter files](#using-the-paramsyml-file) to repeat pipeline runs with the same settings
+without having to write out a command with every single parameter.
 
 :::tip
-If you wish to share such profile (such as upload as supplementary material for academic publications), make sure to NOT include cluster specific paths to files, nor institutional specific profiles.
+If you wish to share such profile (such as upload as supplementary material for academic publications), make sure to NOT include cluster specific paths to
+files, nor institutional specific profiles.
 :::
 
-### **Core `nextflow` arguments**
+## **Core `nextflow` arguments**
 
 :::note
 These options are part of Nextflow and use a *single* hyphen (pipeline parameters use a double-hyphen)
@@ -173,26 +192,34 @@ These options are part of Nextflow and use a *single* hyphen (pipeline parameter
 
 Use this parameter to choose a configuration profile. Profiles can give configuration presets for different compute environments.
 
-Several generic profiles are bundled with the pipeline which instruct the pipeline to use software packaged using different methods (Docker, Singularity, and Apptainer) - see below.
+Several generic profiles are bundled with the pipeline which instruct the pipeline to use software packaged using different methods (Docker, Singularity,
+and Apptainer) - see below.
 
 :::caution[Important!]
 We highly recommend the use of Docker or Singularity containers for full pipeline reproducibility, however when this is not possible, Conda is also supported.
 :::
 
-The pipeline also dynamically loads configurations from [https://github.com/nf-core/configs](https://github.com/nf-core/configs) when it runs, making multiple config profiles for various institutional clusters available at run time. For more information and to check if your system is supported, please see the [nf-core/configs documentation](https://github.com/nf-core/configs#documentation).
+The pipeline also dynamically loads configurations from [https://github.com/nf-core/configs](https://github.com/nf-core/configs) when it runs, making
+multiple config profiles for various institutional clusters available at run time. For more information and to check if your system is supported, please
+see the [nf-core/configs documentation](https://github.com/nf-core/configs#documentation).
 
 Note that multiple profiles can be loaded, for example: `-profile tracking,docker` - the order of arguments is important!
-They are loaded in sequence, so later profiles can overwrite earlier profiles. For a complete description of the available profiles, please see this [section](#choosing-a-profile).
+They are loaded in sequence, so later profiles can overwrite earlier profiles. For a complete description of the available profiles, please see this
+[section](#choosing-a-profile).
 
 ### **`-resume`**
 
-Specify this when restarting a pipeline. Nextflow will use cached results from any pipeline steps where the inputs are the same, continuing from where it got to previously. For input to be considered the same, not only the names must be identical but the files' contents as well. For more info about this parameter, see [this blog post](https://www.nextflow.io/blog/2019/demystifying-nextflow-resume.html).
+Specify this when restarting a pipeline. Nextflow will use cached results from any pipeline steps where the inputs are the same, continuing from where it
+got to previously. For input to be considered the same, not only the names must be identical but the files' contents as well. For more info about this
+parameter, see [this blog post](https://www.nextflow.io/blog/2019/demystifying-nextflow-resume.html).
 
 You can also supply a run name to resume a specific run: `-resume [run-name]`. Use the `nextflow log` command to show previous run names.
 
 ### **`-with-report`**
-Nextflow can create an HTML execution report: a single document which includes many useful metrics about a workflow execution. The report is organised in the three main sections: Summary, Resources and Tasks.
+Nextflow can create an HTML execution report: a single document which includes many useful metrics about a workflow execution. The report is organised
+in the three main sections: Summary, Resources and Tasks.
 
 ### **`-c`**
 
-Specify the path to a specific config file (this is a core Nextflow command). See the [nf-core website documentation](https://nf-co.re/usage/configuration) for more information.
+Specify the path to a specific config file (this is a core Nextflow command). See the [nf-core website documentation](https://nf-co.re/usage/configuration)
+for more information.
