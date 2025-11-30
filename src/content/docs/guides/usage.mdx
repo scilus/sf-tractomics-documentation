@@ -118,14 +118,17 @@ Note that the pipeline will create the following files in your working directory
 
 <FileTree>
   * work/                           # Nextflow working directory
-  * .nextflow\_log                   # Log file from Nextflow
+  * .nextflow\_log                  # Log file from Nextflow
   * sf-tractomics-v0.1.0/           # Results location (defined with --outdir)
+    * pipeline_info                 # GLobal informations on the run
+    * stats                         # Global statistics on the run
     * sub-01
-        * anat/
-        * dwi/
-        * stats/
-        * report/
-  * ...                             # Other nextflow hidden files, eg. history of pipeline runs and old logs.
+      * ...                         # Other entities like session
+        * anat/                     # Clean T1w in diffusion space
+        * dwi/                      # All clean DWI files, models, tractograms, ...
+          * bundles/                # Extracted bundles when using bundling
+      * xfm/                        # Transforms between diffusion and anatomy
+  * ...                             # Other nextflow related files
 </FileTree>
 
 ## **Using the params.yml file**
