@@ -14,9 +14,9 @@ export default defineConfig({
 		starlight({
 			title: 'sf-tractomics',
 			plugins: [
-				starlightVersions({
-					versions: [ ],
-				}),
+				// starlightVersions({
+				// 	versions: [ ],
+				// }),
 			],
 			logo: {
 				light: './src/assets/logo_white.png',
