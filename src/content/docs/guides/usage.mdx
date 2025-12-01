@@ -20,7 +20,11 @@ Some `sf-tractomics` core functionalities are accessed and selected using profil
 
       Activate usage of GPU accelerated algorithms to drastically increase processing speeds. Currently only
       uspports **nvidia GPU**. Accelerations for **FSL Eddy** and **Local tractography** are automatically enabled
-      using this profile. 
+      using this profile.
+
+   2. **`-profile full_pipeline`**
+
+      Runs the full **sf-tractomics** pipeline from end-to-end, with all options.
 
 **Configuration profiles**:
 
@@ -120,7 +124,7 @@ Note that the pipeline will create the following files in your working directory
   * work/                           # Nextflow working directory
   * .nextflow\_log                  # Log file from Nextflow
   * sf-tractomics-v0.1.0/           # Results location (defined with --outdir)
-    * pipeline_info                 # GLobal informations on the run
+    * pipeline_info                 # Global informations on the run
     * stats                         # Global statistics on the run
     * sub-01
       * ...                         # Other entities like session
