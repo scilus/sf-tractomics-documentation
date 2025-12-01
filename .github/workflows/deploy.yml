@@ -1,6 +1,13 @@
 name: Deploy Documentation
 
 on:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Whether to deploy the website to GitHub Pages"
+        type: boolean
+        required: false
+        default: false
   workflow_call:
     inputs:
       deploy:
