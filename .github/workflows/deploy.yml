@@ -1,13 +1,6 @@
 name: Deploy Documentation
 
 on:
-  workflow_dispatch:
-    inputs:
-      deploy:
-        description: "Whether to deploy the website to GitHub Pages"
-        type: boolean
-        required: false
-        default: false
   workflow_call:
     inputs:
       deploy:
@@ -65,8 +58,7 @@ jobs:
           echo 'description: sf-tractomics parameters' | cat - parameters.md > temp && mv temp parameters.md
           echo 'title: Pipeline Parameters' | cat - parameters.md > temp && mv temp parameters.md
           echo '---' | cat - parameters.md > temp && mv temp parameters.md
-          sed -E -i 's/^## (.*)$/### **\1**/' parameters.md
-          sed -E -i '/^# scilus\/sf-tractomics pipeline parameters$/,/^sf-tractomics is a neuroimaging pipeline to process dMRI data\.$/d' parameters.md
+          sed -E -i '/^# scilus\/sf-tractomics pipeline parameters$/,/^Human diffusion MRI processing and tractography$/d' parameters.md
 
       - name: Pack into artifacts
         uses: actions/upload-artifact@v4
