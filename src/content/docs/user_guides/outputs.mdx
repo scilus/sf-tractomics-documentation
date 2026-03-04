@@ -7,15 +7,15 @@ import { FileTree } from '@astrojs/starlight/components';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 The directories listed below will be created in the results directory after the pipeline has finished. All paths
-are relative to the top-level results directory (below `sf-tractomics-v0.1.0` used as example). The pipeline outputs
+are relative to the top-level results directory (below `sf-tractomics-results` used as example). The pipeline outputs
 results in a BIDS-like structure (BIDS derivatives are not officially described and accepted in the BIDS specification,
 so don't hesitate to open an issue if something should be changed). As such, your root output folder will contain one
 folder per subject.
 
 <FileTree>
-  * sf-tractomics-v0.1.0/
-    * pipeline_info/    # Global informations on the run
-    * stats/            # Global statistics on the run
+  * sf-tractomics-results/
+    * pipeline_info/ # Global informations on the run
+    * metrics/          # Tractometry/ROI diffusion metrics.
     * multiqc/          # Global MultiQC report
     * sub-0001/
       * ses-1/          # Session level is created when provided
@@ -35,31 +35,9 @@ pipeline on clusters where file quotas are often rapidly met.
 
 ### **Results**
 
-The pipeline creates 2 folders: the result folder specified by the `--outdir` parameter and the `work` folder. The files in
-the result folder are symlinks into `work`. To transfert or copy-paste the `results` folder, please use one of the following
-commands. We use `sf-tractomics-v0.1.0` as the result folder name, but you might have to change it to your own :
-
-<details markdown="1">
-<summary>On local computer</summary>
-<Tabs>
-  <TabItem label="Command">
-    ```bash
-   cp -rL sf-tractomics-v0.1.0 NEW_PATH/results
-    ```
-  </TabItem>
-</Tabs>
-</details>
-
-<details markdown="1">
-<summary>On HPC</summary>
-<Tabs>
-  <TabItem label="Command">
-    ```bash
-   rsync -rL login@adress:/HPC_PATH/sf-tractomics-v0.1.0 NEW_PATH/results
-    ```
-  </TabItem>
-</Tabs>
-</details>
+The pipeline creates 2 folders: the result folder specified by the `--outdir` parameter and the `work` folder.
+1. The `--outdir` contains *published* files. In essence, *published* files are the final file versions which might be of particular interest after processing. Probably all files you're expecting to get from the pipeline will be contained in this directory.
+2. The `work` folder contains (all) *intermediate* files generated from the pipeline's execution. This may also contain some atlases automatically downloaded during the execution of the pipeline. This folder is essential to keep around when trying to resume the pipeline's execution with `-resume` as, in some ways, it acts as the cache of the pipeline's execution. Although, beware that this directory may contain **a lot** of files and subdirectories.
 
 ### **Pipeline overview**
 

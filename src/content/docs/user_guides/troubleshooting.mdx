@@ -6,6 +6,8 @@ description: Common issues encountered when interacting with the pipeline.
 import { Steps } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 
+This page tries to gather several issues that could be encountered or were encountered in the past with some solutions that seem to resolve the issue. Note that this list is not exhaustive and quite a few other errors might not be covered here. If you encounter any issues running or configuring the pipeline, please [open an issue](https://github.com/scilus/sf-tractomics/issues) so that the maintainers are aware of your issue so that it may be addressed and potentially listed here for other users.
+
 ## Local tracking or EDDY correction error when running with the GPU option
 - Make sure you have a CUDA enabled GPU. At the moment, other GPU types (e.g. AMD) are not supported.
 - Update your CUDA drivers to the latest version. Some CUDA versions interfere with the GPU implementation of some modules. Upgrading to the latest version should fix the issue. If you're using a cluster, you might simply want to run on CPU nodes instead. Otherwise, feel free to open an issue so we can address the issue as quickly as possible.

@@ -31,17 +31,10 @@ export default defineConfig({
 						{ label: 'Installation', slug: 'user_guides/installation' },
 						{ label: 'Prepare your input data', slug: 'user_guides/inputs' },
 						{ label: 'Running the pipeline', slug: 'user_guides/usage' },
-						{ label: "Configure the pipeline", slug: 'user_guides/parameters' },
+						{ label: "Parameters reference", slug: 'user_guides/parameters' },
 						{ label: 'Understand the outputs', slug: 'user_guides/outputs' },
-						{ label: 'Frequently Asked Questions', slug: 'user_guides/faq' },
 						{ label: 'Troubleshooting', slug: 'user_guides/troubleshooting' },
-					],
-				},
-				{
-					label: 'Developer Guides',
-					items: [
-						// Each item here is one entry in the navigation menu.
-						{ label: 'Setup your development environment', slug: 'dev_guides/setup' },
+						{ label: 'Frequently Asked Questions', slug: 'user_guides/faq' },
 					],
 				},
 				{

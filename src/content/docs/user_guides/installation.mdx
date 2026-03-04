@@ -10,7 +10,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## Prerequisites
 
-While you do not need to install every software used within `sf-tractomics`, there is two core dependencies that need to be available at runtime:
+While you do not need to install every software used within `sf-tractomics`, there are two core dependencies that need to be available at runtime:
 
 <Steps>
   1. **Nextflow (>= 25.04.6)**
@@ -182,6 +182,9 @@ While you do not need to install every software used within `sf-tractomics`, the
 </Steps>
 
 ## Install sf-tractomics for online use
+**These steps should be the entry point for most users trying out the pipeline on a local machine with internet access**. If you are trying to run on a cluster where the nodes do not have internet access, please follow the installation steps of the [following section instead](#install-sf-tractomics-for-offline-use) as more steps are required to download the necessary resources.
+
+
      <Steps>
        1. **Release**
 
@@ -271,12 +274,12 @@ While you do not need to install every software used within `sf-tractomics`, the
           </CommandOutputs>
      </Steps>
 
-## Install the pipeline for offline use
+## Install sf-tractomics for offline use
 
 Some computing nodes does not have access to internet at runtime. Since the pipeline interacts with the containers repository and pull during execution, it won’t work if the compute nodes do not have access to the internet. Fortunately, containers can be downloaded prior to the pipeline execution, and fetch locally during runtime. Here are a few steps to perform to get all of that working quickly:
 
 <Steps>
-  1. **(Recommended)** Point the `NXF_HOME` environment variable in your scratch directory. When pulling or running a pipeline by only specifying its name
+  1. **(Recommended)** Point the `NXF_HOME` environment variable in your work/scratch directory. When pulling or running a pipeline, the source files required to run the pipeline will be automatically cloned and fetched in the location pointed by the `NXF_HOME` variable.
      ```bash
      export NXF_HOME=/scratch/${USER}/.nextflow
      ```
@@ -394,7 +397,7 @@ Some computing nodes does not have access to internet at runtime. Since the pipe
       </Steps>
      </details>
 
-     <Aside type="note">
+     <Aside type="tip">
      Downloading all containers takes ~45-60 minutes depending on how much parallel download you selected and requires a fair amount of local disk space. To accelerate the download process, you can increase the number of parallel downloads.
      </Aside>
 
