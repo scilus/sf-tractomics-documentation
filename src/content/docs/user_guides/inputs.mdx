@@ -44,7 +44,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 The participants.tsv file is not required for most modules of the pipeline. However, if you're planning on performing harmonization (e.g. using ClinicalCombat) you should provide a `participants.tsv` file listing different covariates for each subject, session and acquisition run. Also, even if no harmonization is being done and you're performing tractometry, you could also supply this file to carry the covariates along with your tractometry results. The `participants.tsv` file should contain a particular structure. **Minimally**, the `participants.tsv` should contain the following columns (it can also contain more columns):
 
-| participant_label | session | run | site | age | sex | handedness | disease |
+| participant_id | session | run | site | age | sex | handedness | disease |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | sub-001 | 1 |  | Sherbrooke | 78 | 2 | 1 | HC |
 | sub-001 | 2 |  | Sherbrooke | 78 | 2 | 1 | HC |
