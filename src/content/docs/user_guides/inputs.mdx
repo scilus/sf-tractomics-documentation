@@ -101,9 +101,9 @@ entity. The same is expected for the main diffusion volume as well (**AP** and *
       * anat
         * sub-02\_T1w.nii.gz
         * sub-02\_T1w.json
-      * epi
-        * sub-02\_dir-PA\_sbref.nii.gz
-        * sub-02\_dir-PA\_sbref.json
+      * fmap
+        * sub-02\_dir-PA\_epi.nii.gz
+        * sub-02\_dir-PA\_epi.json
 </FileTree>
 
 </TabItem>
@@ -164,11 +164,11 @@ subject,dwi,bval,bvec,sbref,rev_dwi,rev_bval,rev_bvec,rev_sbref,t1,wmparc,aparc_
 | dwi | Diffusion Weighted volume in Nifti format|
 | bval | b-values file following FSL format|
 | bvec | b-vectors file following FSL format|
-| sbref | Single-band b0 reference for the DWI volume in Nifti format|
+| sbref | Single-band b0 reference for the DWI volume in Nifti format (fmap)|
 | rev_dwi | Reverse-phase acquired Diffusion Weighted volume in Nifti format|
 | rev_bval | b-values file for the reverse-phase DWI following FSL format|
 | rev_bvec | b-vectors file for the reverse-phase DWI following FSL format|
-| rev_sbref | Single-band b0 reference for the reverse-phase DWI volume in Nifti format|
+| rev_sbref | Single-band b0 reference for the reverse-phase DWI volume in Nifti format (fmap)|
 | t1 | Anatomical T1-Weighted volume in Nifti format|
 | wmparc | White matter parcellation from _FreeSurfer_|
 | aparc_aseg | Tissue segmentation and cortical parcellation from _FreeSurfer_|
