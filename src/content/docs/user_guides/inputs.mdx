@@ -69,13 +69,17 @@ Although completely optional and in line with the [BIDS specification](https://b
 
 ### Perform Motion and Eddy currents correction
 
-`sf-tractomics` automatically detects **reverse-phase** acquired images and **epi** references from the BIDS dataset
+`sf-tractomics` automatically detects **reverse-phase** acquired images and **epi** or **single-band** (sbref) reference images from the BIDS dataset
 organization. To be detected, those images need to have a valid [direction](https://bids-specification.readthedocs.io/en/stable/appendices/entities.html#dir)
 entity. The same is expected for the main diffusion volume as well (**AP** and **PA** are used as example) :
 
 <Tabs>
 
-<TabItem label="Reverse b0">
+<TabItem label="Reverse b0 (epi)">
+
+<Aside type="note" title="EPI">
+  An distinction should be made [EPI](https://bids-specification.readthedocs.io/en/stable/glossary.html#epi-suffixes) and single-band reference ([SBREF](https://bids-specification.readthedocs.io/en/stable/glossary.html#sbref-suffixes)) images reverse B0s but both are supported by `sf-tractomics`. See more [details about EPI/fmap images here](https://bids-specification.readthedocs.io/en/stable/modality-specific-files/magnetic-resonance-imaging-data.html#case-4-multiple-phase-encoded-directions-pepolar).
+</Aside>
 
 <FileTree>
   * input\_bids\_directory
@@ -89,9 +93,9 @@ entity. The same is expected for the main diffusion volume as well (**AP** and *
       * anat
         * sub-01\_T1w.nii.gz
         * sub-01\_T1w.json
-      * epi
-        * sub-01\_dir-PA\_sbref.nii.gz
-        * sub-01\_dir-PA\_sbref.json
+      * fmap
+        * sub-01\_dir-PA\_epi.nii.gz
+        * sub-01\_dir-PA\_epi.json
     * sub-02
       * dwi
         * sub-02\_dir-AP\_dwi.nii.gz
@@ -104,6 +108,41 @@ entity. The same is expected for the main diffusion volume as well (**AP** and *
       * fmap
         * sub-02\_dir-PA\_epi.nii.gz
         * sub-02\_dir-PA\_epi.json
+</FileTree>
+
+</TabItem>
+
+<TabItem label="Reverse b0 (sbref)">
+
+<Aside type="note" title="SBREF">
+  An distinction should be made [EPI](https://bids-specification.readthedocs.io/en/stable/glossary.html#epi-suffixes) and single-band reference ([SBREF](https://bids-specification.readthedocs.io/en/stable/glossary.html#sbref-suffixes)) images reverse B0s but both are supported by `sf-tractomics`. See more [details about SBREF images here](https://bids-specification.readthedocs.io/en/stable/modality-specific-files/magnetic-resonance-imaging-data.html#echo-planar-imaging-and-b0-mapping).
+</Aside>
+
+<FileTree>
+  * input\_bids\_directory
+    * dataset_description.json
+    * sub-01
+      * dwi
+        * sub-01\_dir-AP\_dwi.nii.gz
+        * sub-01\_dir-AP\_dwi.bval
+        * sub-01\_dir-AP\_dwi.bvec
+        * sub-01\_dir-AP\_dwi.json
+        * sub-01\_dir-PA\_sbref.nii.gz
+        * sub-01\_dir-PA\_sbref.json
+      * anat
+        * sub-01\_T1w.nii.gz
+        * sub-01\_T1w.json
+    * sub-02
+      * dwi
+        * sub-02\_dir-AP\_dwi.nii.gz
+        * sub-02\_dir-AP\_dwi.bval
+        * sub-02\_dir-AP\_dwi.bvec
+        * sub-02\_dir-AP\_dwi.json
+        * sub-02\_dir-PA\_sbref.nii.gz
+        * sub-02\_dir-PA\_sbref.json
+      * anat
+        * sub-02\_T1w.nii.gz
+        * sub-02\_T1w.json
 </FileTree>
 
 </TabItem>
@@ -164,11 +203,11 @@ subject,dwi,bval,bvec,sbref,rev_dwi,rev_bval,rev_bvec,rev_sbref,t1,wmparc,aparc_
 | dwi | Diffusion Weighted volume in Nifti format|
 | bval | b-values file following FSL format|
 | bvec | b-vectors file following FSL format|
-| sbref | Single-band b0 reference for the DWI volume in Nifti format (fmap)|
+| sbref | Single-band b0 reference for the DWI volume in Nifti format (\*_sbref.\* under dwi or \*_epi.\* under fmap)|
 | rev_dwi | Reverse-phase acquired Diffusion Weighted volume in Nifti format|
 | rev_bval | b-values file for the reverse-phase DWI following FSL format|
 | rev_bvec | b-vectors file for the reverse-phase DWI following FSL format|
-| rev_sbref | Single-band b0 reference for the reverse-phase DWI volume in Nifti format (fmap)|
+| rev_sbref | Single-band b0 reference for the reverse-phase DWI volume in Nifti format (*_sbref.* under dwi or *_epi.* under fmap)|
 | t1 | Anatomical T1-Weighted volume in Nifti format|
 | wmparc | White matter parcellation from _FreeSurfer_|
 | aparc_aseg | Tissue segmentation and cortical parcellation from _FreeSurfer_|
